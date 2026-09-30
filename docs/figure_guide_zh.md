@@ -1,55 +1,55 @@
-# 八张图的公式、参数和绘制过程
+# Formulas, parameters, and construction of the eight figures
 
-## 1. 共用参数与记号
+## 1. Shared parameters and notation
 
-所有数值从 `config/parameters.json` 读取。除特别说明，使用下表。
+All numerical values are read from `config/parameters.json`. Unless stated otherwise, the following defaults apply.
 
-| 参数 | 基准值 | 含义 / 单位 |
+| Parameter | Default | Meaning / unit |
 |---|---:|---|
-| a | 20 | 逆需求截距；归一化价格单位 |
-| b | 1 | 逆需求斜率，p(Q)=a−bQ |
-| t̄ | 4 | 两家运营商平均单位成本截距 |
-| Δ | 2 | 成本差 t₂−t₁；t₁=t̄−Δ/2，t₂=t̄+Δ/2 |
-| κ | 1 | 运营成本曲率；OCᵢ=tᵢqᵢ+κqᵢ² |
-| B | 1.5 | 拥堵参数 |
-| γ | 1 | 动态模型中利用率平方项的曲率 |
-| r | 30 | 一次性投资成本 I(K)=rK²/2 的曲率 |
-| δ | .9 | 折现因子；R=r(1−δ)=3 |
+| a | 20 | Inverse-demand intercept; normalized price unit |
+| b | 1 | Inverse-demand slope, p(Q)=a−bQ |
+| t̄ | 4 | Mean unit-cost intercept across two operators |
+| Δ | 2 | Cost difference t₂−t₁; t₁=t̄−Δ/2, t₂=t̄+Δ/2 |
+| κ | 1 | Operating-cost curvature; OCᵢ=tᵢqᵢ+κqᵢ² |
+| B | 1.5 | Congestion parameter |
+| γ | 1 | Curvature of squared utilization in the dynamic model |
+| r | 30 | Curvature of one-time investment cost I(K)=rK²/2 |
+| δ | .9 | Discount factor; R=r(1−δ)=3 |
 
-辅助记号：g=b+B；h=b+2B；C̄=B+γ/2=2；m=a−t̄−C̄=14。
+Auxiliary notation: g=b+B; h=b+2B; C̄=B+γ/2=2; m=a−t̄−C̄=14.
 
-**不同模型的拥堵归一化不能混用：**
+**Do not mix the congestion normalizations used by different models:**
 
-- Model A/B 使用 C(Q)=BQ；不使用配置中的 γ。
-- Model C 使用 N=K，因此 C(K,K)=B+γ/2。
-- Model D 使用 C(N,K)=B(N/K)+(γ/2)(N/K)²。
+- Models A/B use C(Q)=BQ and do not use γ from the configuration.
+- Model C sets N=K, so C(K,K)=B+γ/2.
+- Model D uses C(N,K)=B(N/K)+(γ/2)(N/K)².
 
-所有量为论文的归一化连续量，不是已测量的架次、人民币或分钟。网格点数是复现实现的数值分辨率，不是样本量；这些确定性理论图没有统计误差条。
+All quantities are normalized continuous quantities in the paper, not measured flight counts, yuan, or minutes. Grid sizes are numerical resolution choices for this implementation, not sample sizes. These deterministic theoretical plots have no statistical error bars.
 
-## 2. 图 1：收入排名
+## 2. Figure 1: revenue ranking
 
-横轴 N∈[.02,3.5]。成本为 t₁=3、t₂=5。令 Ā=a−t̄−gN。
+The horizontal axis is N∈[.02,3.5]. Costs are t₁=3 and t₂=5. Let Ā=a−t̄−gN.
 
-原图三条曲线为：
+The original figure's three curves are:
 
 ```text
 U_NS = (a−t̄)N − (g+κ)N²
 U_M  = (a−t̄)N − (g+2κ)N²
-U_V  = (a−t₂)N − (g+κ)N²                       当 N≤Δ/(2κ)
-       (a−t̄)N − (g+3κ/2)N² − Δ²/(8κ)         当 N>Δ/(2κ)
+U_V  = (a−t₂)N − (g+κ)N²                       when N≤Δ/(2κ)
+       (a−t̄)N − (g+3κ/2)N² − Δ²/(8κ)         when N>Δ/(2κ)
 ```
 
-竖线分别是 Δ/(4κ)=.5、Δ/(2κ)=1。仿射 MUPA 的有效范围是 .5<N<16/4.5；低于下界的部分用点线画出。VCG 按 `eq:vcg-corner-revenue` / `eq:vcg-revenue-interior` 分段。
+The vertical lines mark Δ/(4κ)=.5 and Δ/(2κ)=1. The affine MUPA equilibrium is valid for .5<N<16/4.5; its segment below the lower bound is dotted. VCG revenue is piecewise according to `eq:vcg-corner-revenue` and `eq:vcg-revenue-interior`.
 
-**原图的非策略曲线有内点外推。** 若 N≤1，正确的单一运营商非策略报价清算收入应为 `(a−t₁)N−(g+2κ)N²`。为了同时保留原图及经济解释，图中仍复现原曲线，`data/fig1.csv` 另列 `U_NS_piecewise` 和有效性标记。
+**The original non-strategic curve extrapolates an interior formula.** For N≤1, the correct single-operator non-strategic clearing revenue is `(a−t₁)N−(g+2κ)N²`. To preserve both the original visual and the economic interpretation, the plot reproduces the original curve, while `data/fig1.csv` separately includes `U_NS_piecewise` and validity flags.
 
-代码：`revenues()`、`auction()`、`fig1()`。
+Code: `revenues()`, `auction()`, `fig1()`.
 
-## 3. 图 2：治理目标与退出边界
+## 3. Figure 2: governance objectives and the exit boundary
 
-横轴 α∈[1,4]。
+The horizontal axis is α∈[1,4].
 
-(a) 设置 Δ=7.5、t̄=4，即 t₁=.25、t₂=7.75。定义：
+(a) Set Δ=7.5 and t̄=4, giving t₁=.25 and t₂=7.75. Define:
 
 ```text
 L_A = h+2(α−1)g
@@ -59,22 +59,22 @@ q₁A = Q_A/2 + αΔ/(4M_A)
 q₂A = Q_A/2 − αΔ/(4M_A)
 ```
 
-若 q₂A≤0，则使用角点 `q₁A=α(a−t₁)/(L_A+2M_A)`、q₂A=0，并以虚线表示。不是把负的 q₂ 简单截成零后保留原 q₁，而是重新求对应的角点最优解。
+If q₂A≤0, use the corner solution `q₁A=α(a−t₁)/(L_A+2M_A)`, q₂A=0, shown with a dashed line. This re-solves the corner optimum; it does not merely clip a negative q₂ to zero while retaining the interior q₁.
 
-(b) 设置 Δ=10、t̄=6，即 t₁=1、t₂=11：
+(b) Set Δ=10 and t̄=6, giving t₁=1 and t₂=11:
 
 ```text
 D_M = b+2B+κ+2(α−1)(g+2κ)
 N_M = α(a−t̄)/D_M
 ```
 
-只有 `N_M>Δ/(4κ)=2.5` 且清算价格为正，才属于所研究的双运营商仿射均衡。剩余部分是点线延长的候选公式。
+Only `N_M>Δ/(4κ)=2.5` with a positive clearing price belongs to the studied two-operator affine equilibrium. The remainder is a dotted extension of the candidate formula.
 
-来源：`eq:model-a-total`—`eq:model-a-corner`、`eq:optimal-auction-supply`。代码：`model_a()`、`auction_supply()`、`fig2()`。
+Sources: `eq:model-a-total`–`eq:model-a-corner`, `eq:optimal-auction-supply`. Code: `model_a()`, `auction_supply()`, `fig2()`.
 
-## 4. 图 3：平台目标比值
+## 4. Figure 3: platform-objective ratio
 
-扫描 α∈[1,3.5]，分别设 Δ=0、2、4。每种机制先求自己的最优数量，再计算目标函数。
+Scan α∈[1,3.5] for Δ=0, 2, and 4. First find each mechanism's own optimal quantities, then evaluate its objective function.
 
 ```text
 zᵢ = a−gQ−tᵢ−(g+2κ)qᵢ
@@ -83,16 +83,16 @@ W_A = aQ−(b/2+B)Q²−Σ(tᵢqᵢ+κqᵢ²)
 OF_A = W_A+(α−1)U_A
 W_M = (a−t̄)N−(b+2B+κ)N²/2+3Δ²/(32κ)
 OF_M = W_M+(α−1)U_M
-纵轴 = OF_M(N_M*) / OF_A(q_A*)
+Vertical axis = OF_M(N_M*) / OF_A(q_A*)
 ```
 
-两种机制均使用自己的最优点，不能把相同数量代入后称作这张图。脚本检查两者是否均处于内点区域。
+Both mechanisms use their own optima; substituting the same quantity into both objectives would produce a different plot. The script checks that both solutions are interior.
 
-来源：`eq:platform-objective`、`eq:mupa-welfare`。代码：`fig3()`。
+Sources: `eq:platform-objective`, `eq:mupa-welfare`. Code: `fig3()`.
 
-## 5. 图 4：重复博弈协调阈值
+## 5. Figure 4: repeated-game coordination threshold
 
-固定 K=2.5，扫描 Δ∈[0,5]。使用动态拥堵 C̄=2：
+Fix K=2.5 and scan Δ∈[0,5]. Use dynamic congestion C̄=2:
 
 ```text
 Aᵢ(K) = a−bK−C̄−tᵢ
@@ -104,15 +104,15 @@ q₁N = K/2+Δ/(8κ), q₂N=K/2−Δ/(8κ)
 δ* = max(δ₁*,δ₂*)
 ```
 
-画图前检验 `A₂≥2κK`，保证“取得所有容量”确实是可用的最优偏离；并检验惩罚所用 Nash 分支存在。阈值约从 .544 上升到 .703，运营商 1 的约束更紧。
+Before plotting, check `A₂≥2κK` so that taking all capacity really is the feasible best deviation, and check that the Nash branch used for punishment exists. The threshold rises from about .544 to .703; operator 1 has the tighter constraint.
 
-这描述**平坦零报价 + grim trigger**。截断真实报价可以在图中条件下一次博弈就实现零价格平分，因此不能把这条曲线解释为所有零价格均衡都需要的耐心程度。
+This describes **flat zero bids with grim-trigger punishment**. Under the displayed conditions, truncated truthful bids can implement an equal zero-price allocation as a one-shot equilibrium. The curve therefore is not a patience requirement for every possible zero-price equilibrium.
 
-来源：`eq:collusive-profit`、`eq:deviation-profit`、`eq:punishment-profit`、`eq:cartel-threshold`。代码：`coordination()`。
+Sources: `eq:collusive-profit`, `eq:deviation-profit`, `eq:punishment-profit`, `eq:cartel-threshold`. Code: `coordination()`.
 
-## 6. 图 5：Nash 与协调容量
+## 6. Figure 5: Nash versus coordinated capacity
 
-固定 α=2、r=30，扫描 R∈[1.3,8]，同步设 δ=1−R/30。原图曲线的起点经矢量坐标核对为 1.3，而不是把正文中四舍五入后的 δ=.96 反算成 R=1.2。
+Fix α=2 and r=30. Scan R∈[1.3,8] while setting δ=1−R/30. A vector-coordinate check of the original figure puts the curve's starting point at 1.3; it is not R=1.2 obtained by back-calculating the rounded δ=.96 in the main text.
 
 ```text
 D_N = b+κ+2(α−1)(b+2κ)
@@ -120,15 +120,15 @@ K_N* = αm/(D_N+R)
 K_C* = m/(b+κ+R)
 ```
 
-交点是 R=b+3κ=4。检查两条容量均满足 `Δ/(4κ)<K<m/(b+2κ)`；还检查协调容量的全容量偏离条件与 δ≥δ*(K_C*)。
+The curves intersect at R=b+3κ=4. Check that both capacities satisfy `Δ/(4κ)<K<m/(b+2κ)`. Also check the full-capacity deviation condition for coordinated capacity and δ≥δ*(K_C*).
 
-设置储备价格为 Nash 价格时，论文在额外可实施性假设下给出同一个容量候选；程序不把这个条件性结论当作一般实施证明。
+With a reserve price set to the Nash price, the paper obtains the same capacity candidate under additional implementation assumptions. The program does not treat that conditional result as a general implementation proof.
 
-来源：`eq:nash-optimal-capacity`、`eq:collusive-optimal-capacity`。代码：`capacities()`、`fig5()`。
+Sources: `eq:nash-optimal-capacity`, `eq:collusive-optimal-capacity`. Code: `capacities()`, `fig5()`.
 
-## 7. 图 6：状态依赖的释放
+## 7. Figure 6: state-contingent release
 
-α=1.5；a_L=12、a_H=20；K∈[.55,4.5]。对每个 K 与需求状态 a，定义 `H=D_N K+2αB`，求：
+Set α=1.5, a_L=12, a_H=20, and K∈[.55,4.5]. For each K and demand state a, define `H=D_N K+2αB` and solve:
 
 ```text
 (3αγ/2)x² + Hx − α(a−t̄) = 0
@@ -137,60 +137,60 @@ x* = min(1,x_hat)
 N* = Kx*
 ```
 
-此正根写法与附录公式等价，但避免两个相近数相减造成精度损失，并自然包含 γ=0 的线性极限。两状态的全释放切换点为 K=1.05、3.45。
+This positive-root expression is equivalent to the appendix formula but avoids subtracting two nearly equal numbers, and it naturally includes the linear γ=0 limit. The full-release transition points in the two states are K=1.05 and 3.45.
 
-每个候选必须同时满足 `N>Δ/(4κ)` 和 `y=a−t̄−(b+2κ)N−C(N,K)>0`。程序不以 `min(1,x_hat)` 代替对退出、零价格和未售完情况的单独求解。
+Each candidate must also satisfy `N>Δ/(4κ)` and `y=a−t̄−(b+2κ)N−C(N,K)>0`. The program does not use `min(1,x_hat)` as a substitute for separately solving exit, zero-price, or unsold-capacity cases.
 
-来源：`eq:unconstrained-utilization`、`eq:state-valid-domain`。代码：`release()`。
+Sources: `eq:unconstrained-utilization`, `eq:state-valid-domain`. Code: `release()`.
 
-## 8. 图 7：不确定性与投资
+## 8. Figure 7: uncertainty and investment
 
-α=1.5、δ=.9、r=30，所以 R=3。
+Set α=1.5, δ=.9, and r=30, so R=3.
 
-(a) 状态为 16−s、16+s，概率均为 .5；s∈[0,6]。(b) 状态固定为 12、20，扫描高状态概率 φ_H∈[0,1]。
+(a) States are 16−s and 16+s with probability .5 each; s∈[0,6]. (b) States are fixed at 12 and 20 while high-state probability φ_H scans [0,1].
 
-给定 K，先调用图 6 的释放规则，计算约束乘子与拥堵缓解项：
+For a given K, apply the Figure 6 release rule, then calculate the constraint multiplier and congestion-relief term:
 
 ```text
 μω = max[0, α(aω−t̄)−D_N K−2αB−3αγ/2]
 reliefω = α(Bxω²+γxω³)
-投资方程: RK = Σ φω (reliefω+μω)
+Investment equation: RK = Σ φω (reliefω+μω)
 ```
 
-使用 SciPy `brentq` 求一维零点，绝对求根容差 1e−12。求根之后逐状态检查价格与双运营商有效域，包括概率为 0 的端点状态，以对应论文的较强表述。
+Use SciPy `brentq` to find the one-dimensional root, with absolute root tolerance 1e−12. After root finding, check prices and the two-operator valid domain state by state, including zero-probability endpoint states, to match the paper's stronger formulation.
 
-图 (a) 左轴画 K，右轴分别画期望拥堵缓解与期望稀缺租；两项之和必须等于 RK。s≤1.25 时 K=1.875；s=6 时 K≈2.26。图 (b) 两端约为 1.15、2.625。
+Panel (a) shows K on the left axis and expected congestion relief and expected scarcity rent on the right axis. Their sum must equal RK. For s≤1.25, K=1.875; at s=6, K≈2.26. The two endpoints of panel (b) are approximately 1.15 and 2.625.
 
-CSV 输出两状态的释放量以及投资方程残差。独立测试另用 SLSQP 同时优化 `(K,N_L,N_H)`，交叉检验一维包络解。
+The CSV exports release quantities in both states and the investment-equation residual. An independent test also jointly optimizes `(K,N_L,N_H)` with SLSQP to cross-check the one-dimensional envelope solution.
 
-来源：`eq:stochastic-capacity-foc`、`eq:release-kkt`。代码：`investment()`、`fig7()`。
+Sources: `eq:stochastic-capacity-foc`, `eq:release-kkt`. Code: `investment()`, `fig7()`.
 
-## 9. 图 8：参数区域图
+## 9. Figure 8: parameter-region maps
 
-(a) x=B/b、y=κ/b，均扫描 [0,3]。边界为：
+(a) Scan x=B/b and y=κ/b, both over [0,3]. The boundaries are:
 
-- x=1：自由进入交通量相对第一最优由不足切换为过量。
-- y=(1+x)/2：MUPA 与最优统一收费的分配效率比较边界。
-- y=1+x：VCG 与第一最优区别收费的收入比较边界。
+- x=1: free-entry traffic switches from below to above the first-best level.
+- y=(1+x)/2: allocative-efficiency comparison between MUPA and optimal uniform charging.
+- y=1+x: revenue comparison between VCG and first-best differentiated charges.
 
-这些直线总结论文在相应内点与可行性条件下的比较，并不保证图上任意斜率组合都满足所有数量条件。y=0 也是原图显示范围的边界，不属于 κ>0 的原始假设。
+These lines summarize comparisons under the corresponding interior and feasibility conditions in the paper. They do not guarantee that every slope combination shown satisfies all quantity conditions. The displayed y=0 boundary also violates the primitive assumption κ>0.
 
-(b) Δ∈[0,10]、K∈[.6,5.2]。先检查双运营商正价格 Nash 分支，再检查零价格平分的一次博弈条件。设 Aᵢ=m−bK±Δ/2：
+(b) Scan Δ∈[0,10] and K∈[.6,5.2]. First check for the two-operator positive-price Nash branch, then test the one-shot conditions for an equal zero-price allocation. Set Aᵢ=m−bK±Δ/2:
 
 ```text
-前提: A₂≥κK
-如果 Δ≤κK: 通过一次博弈测试
-否则:
+Prerequisite: A₂≥κK
+If Δ≤κK: pass the one-shot test
+Otherwise:
   q_dev = clip[(Δ+2κK)/(6κ), K/2, K]
-  偏离收益 = (Δ+2κK)q_dev−3κq_dev²
-  平分收益 = A₁K/2−κK²/4
-  当且仅当偏离收益≤平分收益时通过测试
+  Deviation payoff = (Δ+2κK)q_dev−3κq_dev²
+  Equal-share payoff = A₁K/2−κK²/4
+  Pass the test if and only if deviation payoff≤equal-share payoff
 ```
 
-CSV 的 region 编码：0=无双运营商正价格 Nash 分支；1=该 Nash 分支存在，但一次博弈测试未通过；2=该 Nash 分支存在且测试通过。**未通过这一构造的测试不等于证明不存在其他零价格均衡。**
+CSV `region` codes: 0=no two-operator positive-price Nash branch; 1=that Nash branch exists but the one-shot test fails; 2=that Nash branch exists and the test passes. **Failure of this construction does not prove that other zero-price equilibria do not exist.**
 
-横线给出 δ=.90、.95 时的 K_C*=2.8、4.0，以及图 4 使用的 K=2.5。
+Horizontal lines mark K_C*=2.8 and 4.0 at δ=.90 and .95, respectively, plus the K=2.5 used in Figure 4.
 
-原图在 t̄=4 时扫描到 Δ=10；Δ≥8 超出 t₁>0 的假设。仓库保留原图范围，但 `primitive_cost_valid` 在该区为 False。需要严格限定正成本时，可把配置中的 Δ 上界改为 7.99；这将成为缩小范围后的图，而非原图完整范围。
+The original figure scans Δ to 10 with t̄=4; Δ≥8 falls outside the assumption t₁>0. The repository retains the original range, while `primitive_cost_valid` is False in that region. To impose strictly positive costs, change the upper Δ bound in the configuration to 7.99; the result will cover a smaller domain than the original figure.
 
-来源：`eq:zero-fee-comparison`、`eq:uniform-charge-loss`、`eq:fb-revenue-ranking`、`eq:one-shot-zero-condition`。代码：`one_shot_zero()`、`fig8()`。
+Sources: `eq:zero-fee-comparison`, `eq:uniform-charge-loss`, `eq:fb-revenue-ranking`, `eq:one-shot-zero-condition`. Code: `one_shot_zero()`, `fig8()`.
