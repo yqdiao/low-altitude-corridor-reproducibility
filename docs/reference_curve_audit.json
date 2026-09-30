@@ -1,0 +1,79 @@
+{
+  "method": "Original PDF vector-path vertices transformed using original axis tick coordinates; analytical evaluation at those x coordinates. Not a pixel or byte-identity test.",
+  "absolute_tolerance": 2e-05,
+  "all_passed": true,
+  "curves": [
+    {
+      "figure": 1,
+      "curve": "truthful interior curve",
+      "vertices": 106,
+      "max_absolute_error": 1.4944142918693615e-06
+    },
+    {
+      "figure": 1,
+      "curve": "VCG piecewise",
+      "vertices": 112,
+      "max_absolute_error": 2.561712775239755e-06
+    },
+    {
+      "figure": 1,
+      "curve": "MUPA",
+      "vertices": 104,
+      "max_absolute_error": 3.6708350465985973e-06
+    },
+    {
+      "figure": 1,
+      "curve": "MUPA",
+      "vertices": 192,
+      "max_absolute_error": 1.6310019780862994e-06
+    },
+    {
+      "figure": 3,
+      "curve": "ratio Delta=0",
+      "vertices": 74,
+      "max_absolute_error": 4.341122350481896e-09
+    },
+    {
+      "figure": 3,
+      "curve": "ratio Delta=2",
+      "vertices": 80,
+      "max_absolute_error": 4.807573672493959e-09
+    },
+    {
+      "figure": 3,
+      "curve": "ratio Delta=4",
+      "vertices": 86,
+      "max_absolute_error": 8.616193647448256e-09
+    },
+    {
+      "figure": 4,
+      "curve": "grim-trigger threshold",
+      "vertices": 200,
+      "max_absolute_error": 1.6466452423813394e-08
+    },
+    {
+      "figure": 5,
+      "curve": "Nash capacity",
+      "vertices": 38,
+      "max_absolute_error": 1.3781955798819467e-07
+    },
+    {
+      "figure": 5,
+      "curve": "coordinated capacity",
+      "vertices": 72,
+      "max_absolute_error": 2.2557701551129128e-07
+    },
+    {
+      "figure": 6,
+      "curve": "low-demand release",
+      "vertices": 38,
+      "max_absolute_error": 3.437298015107615e-07
+    },
+    {
+      "figure": 6,
+      "curve": "high-demand release",
+      "vertices": 12,
+      "max_absolute_error": 3.025096182440734e-07
+    }
+  ]
+}
