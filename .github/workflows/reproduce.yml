@@ -1,0 +1,23 @@
+name: Reproduce all figures
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python reproduce.py --output reproduced
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reproduced-figures-and-data
+          path: reproduced/
