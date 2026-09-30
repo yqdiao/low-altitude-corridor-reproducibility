@@ -137,7 +137,7 @@ def fig8(c,p,d):
     for disc,ls in zip(c['discounts'],['--','-.']):
         kc=p.m/(p.b+p.kappa+p.r*(1-disc));ax.axhline(kc,color=BLUE,ls=ls,lw=1);ax.text(.2,kc+.05,fr'$K_C^*,\ \delta={disc:g}$',fontsize=7)
     ax.axhline(2.5,color=GRAY,ls=':',lw=1);ax.text(.2,2.55,'Fig. 4 slice',fontsize=7)
-    ax.text(1.9,1.45,'Zero-price split is\na one-shot equilibrium',fontsize=7);ax.text(7,3.55,'One-shot test\nnot satisfied',fontsize=7);ax.text(6.5,.82,'No two-operator\nNash branch',fontsize=7)
+    ax.text(1.9,1.45,'Zero-price split is\na one-shot equilibrium',fontsize=7);ax.annotate('One-shot test\nnot satisfied',xy=(9.65,4.35),xytext=(6.7,3.55),fontsize=7,arrowprops=dict(arrowstyle='->',color=GRAY,lw=.8));ax.text(6.5,.82,'No two-operator\nNash branch',fontsize=7)
     ax.set(title='(b) Coordination in Model C',xlabel=r'Cost asymmetry $\Delta$',ylabel=r'Installed capacity $K$',xlim=(delta[0],delta[-1]),ylim=(K[0],K[-1]))
     # Full original Delta range is retained; invalid primitive costs are flagged in data/docs.
     csv(d/'fig8a.csv',B_over_b=X,kappa_over_b=Y,free_access_overuse=X>1,mupa_beats_uniform=(1+X)>2*Y,vcg_exceeds_fees=(1+X)>Y)
